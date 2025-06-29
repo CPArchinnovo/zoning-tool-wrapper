@@ -1,1 +1,1 @@
-git+https://$GITHUB_TOKEN:x-oauth-basic@github.com/CParchinnovo/zoning-core.git@main#egg=zoning-core
+streamlit>=1.34
