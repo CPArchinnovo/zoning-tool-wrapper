@@ -1,10 +1,11 @@
-import os, sys, subprocess, tempfile, site, streamlit as st
+import os, sys, subprocess, tempfile, site
+import streamlit as st   # keep Streamlit imported first for safety
 
-# 1️⃣ retrieve the PAT that Streamlit injects as an env-var
-token = os.environ["GITHUB_TOKEN"]              # MUST exist in Settings ▸ Secrets
+# 1️⃣  PAT injected from Streamlit → Secrets
+token = os.environ["GITHUB_TOKEN"]          # MUST exist in Cloud
 
-# 2️⃣ pip-install the private repo into a writable temp directory
-tmp_dir = tempfile.mkdtemp()                    # e.g. /tmp/tmpabcd1234
+# 2️⃣  writable temp dir + pip install *into* that dir
+tmp_dir = tempfile.mkdtemp()                # e.g. /tmp/tmpabc123
 repo_url = (
     f"git+https://__token__:{token}"
     f"@github.com/CParchinnovo/zoning-core.git@main"
@@ -12,15 +13,18 @@ repo_url = (
 
 subprocess.check_call(
     [
-        sys.executable, "-m", "pip", "install",
-        "--no-cache-dir", "--target", tmp_dir, repo_url,
+        sys.executable,
+        "-m", "pip", "install",
+        "--no-cache-dir",
+        "--target", tmp_dir,               # <-- critical: write to /tmp
+        repo_url,
     ]
 )
 
-# 3️⃣ tell Python to import from that folder
+# 3️⃣  make Python import from /tmp/tmpabc123
 site.addsitedir(tmp_dir)
 
-# 4️⃣ launch the real Streamlit app
+# 4️⃣  import and launch your real Streamlit app
 from zoning_core import run_app
 
 if __name__ == "__main__":
